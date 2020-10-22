@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const offreLBS = require('./LBS/offreLBS')
+const etudiantLBS = require('./LBS/etudiantLBS')
+const { request, response } = require('express')
 // create application/json parser
 var jsonParser = bodyParser.json()
 
@@ -20,7 +22,22 @@ app.get('/offre/like/:id', async (request, response) => {
 })
 
 app.post('/like', jsonParser, async (request, response) => {
-  const offres = await offreLBS.like(request.body.idOffre, request.body.idEtudiant)
+  await offreLBS.like(request.body.idOffre, request.body.idEtudiant)
+  response.status(201).json("Created")
+})
+
+app.get('/etudiants', async(request, response) => {
+  const etudiants = await etudiantLBS.getEtudiants()
+  response.status(200).json(etudiants)
+})
+
+app.get('/etudiants/:id', async(request, response) => {
+  const etudiant = await etudiantLBS.getEtudiantById(request.params.id)
+  response.status(200).json(etudiant)
+})
+
+app.post('/etudiant', jsonParser, async (request, response) => {
+  await etudiantLBS.insertEtudiant(request.body)
   response.status(201).json("Created")
 })
 
