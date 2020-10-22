@@ -1,22 +1,27 @@
 const express = require('express')
 const app = express()
-const Pool = require('pg').Pool
-const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'CVTeque',
-  password: 'admin',
-  port: 5432,
+const bodyParser = require('body-parser')
+const offreLBS = require('./LBS/offreLBS')
+// create application/json parser
+var jsonParser = bodyParser.json()
+
+app.get('/offres', async (request, response) => {
+  const offres = await offreLBS.getOffre()
+  response.status(200).json(offres)
+})
+app.get('/offres/ecole/:id', async (request, response) => {
+  const offres = await offreLBS.getOffreByEcole(request.params.id)
+  response.status(200).json(offres)
 })
 
+app.get('/offre/like/:id', async (request, response) => {
+  const offres = await offreLBS.getOffreLiked(request.params.id)
+  response.status(200).json(offres)
+})
 
-app.get('/offres', (request, response) => {
-    pool.query('SELECT * FROM etudiant ORDER BY id ASC', (error, results) => {
-      if (error) {
-        throw error
-      }
-      response.status(200).json(results.rows)
-    })
+app.post('/like', jsonParser, async (request, response) => {
+  const offres = await offreLBS.like(request.body.idOffre, request.body.idEtudiant)
+  response.status(201).json("Created")
 })
 
 app.listen(3000, () => {
