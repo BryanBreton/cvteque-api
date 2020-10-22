@@ -1,5 +1,5 @@
 const db = require('../database')
-const requests = require('../Requests/requests')
+const requests = require('../Requests/offreRequests')
 module.exports = {
     getOffre: async () => {
         const res = await db.pool.query(requests.getOffres)
