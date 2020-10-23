@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
@@ -39,6 +40,12 @@ app.get('/etudiants/:id', async(request, response) => {
 app.post('/etudiant', jsonParser, async (request, response) => {
   await etudiantLBS.insertEtudiant(request.body)
   response.status(201).json("Created")
+})
+
+app.post('/connexionEtudiant', async (request, response) => {
+  const params = request.headers.authorization.split(":")
+  const user = await etudiantLBS.connexionEtudiant(params[0], params[1])
+  response.status(200).json(user)
 })
 
 app.listen(3000, () => {
