@@ -9,13 +9,13 @@ module.exports = {
     },
     getEtudiantById: async (id) => {
         const res = await db.pool.query(requests.getEtudiantById, [id])
-        return res.rows
+        return etudiantProcess.getFirstEtudiant(res.rows)
     },
     insertEtudiant: async (etudiant) => {
         await db.pool.query(requests.insertEtudiant, [etudiant.nom, etudiant.prenom, etudiant.email, etudiant.password, etudiant.dateNaissance, etudiant.idEcole])
     },
-    connexionEtudiant: async (email, password) => {
-        const res = await db.pool.query(requests.connexionEtudiant, [email, password])
+    connexionEtudiant: async (params) => {
+        const res = await db.pool.query(requests.connexionEtudiant, [params[0], params[1]])
         const user = await etudiantProcess.getFirstEtudiant(res.rows)
         return user
     }

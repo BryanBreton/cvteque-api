@@ -6,6 +6,7 @@ const offreLBS = require('./LBS/offreLBS')
 const etudiantLBS = require('./LBS/etudiantLBS')
 const ecoleLBS = require('./LBS/ecoleLBS')
 const { request, response } = require('express')
+const entrepriseLBS = require('./LBS/entrepriseLBS')
 // create application/json parser
 var jsonParser = bodyParser.json()
 
@@ -43,9 +44,9 @@ app.post('/etudiant', jsonParser, async (request, response) => {
   response.status(201).json("Created")
 })
 
-app.post('/connexionEtudiant', async (request, response) => {
+app.get('/connexionEtudiant', async (request, response) => {
   const params = request.headers.authorization.split(":")
-  const user = await etudiantLBS.connexionEtudiant(params[0], params[1])
+  const user = await etudiantLBS.connexionEtudiant(params)
   response.status(200).json(user)
 })
 
@@ -57,6 +58,22 @@ app.post('/ecole', jsonParser, async (request, response) => {
 app.get('/ecole/filtre', async(request, response) => {
   const ecoles = await ecoleLBS.getEcoleFiltered(request.query)
   response.status(200).json(ecoles)
+})
+
+app.get('/entreprises/:id', async(request, response) => {
+  const entreprise = await entrepriseLBS.getEntrepriseById(request.params.id)
+  response.status(200).json(entreprise)
+})
+
+app.get('/connexionEntreprise', async (request, response) => {
+  const params = request.headers.authorization.split(":")
+  const entreprise = await entrepriseLBS.connexionEntreprise(params)
+  response.status(200).json(entreprise)
+})
+
+app.post('/entreprises', jsonParser, async(request, response) => {
+  entrepriseLBS.insertEntreprise(request.body)
+  response.status(201).json("Created")
 })
 
 app.listen(3000, () => {
