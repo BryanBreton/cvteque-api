@@ -12,7 +12,6 @@ module.exports = {
         return res.rows
     },
     insertEtudiant: async (etudiant) => {
-        console.log(etudiant);
         await db.pool.query(requests.insertEtudiant, [etudiant.nom, etudiant.prenom, etudiant.email, etudiant.password, etudiant.dateNaissance, etudiant.idEcole])
     },
     connexionEtudiant: async (email, password) => {
