@@ -1,30 +1,50 @@
 require('dotenv').config()
 const express = require('express')
-const app = express()
 const bodyParser = require('body-parser')
+const { request, response } = require('express')
+const cors = require('cors')
+const cookieParser = require('cookie-parser')
+
+const {verify} = require('./middleware')
 const offreLBS = require('./LBS/offreLBS')
 const etudiantLBS = require('./LBS/etudiantLBS')
 const ecoleLBS = require('./LBS/ecoleLBS')
-const { request, response } = require('express')
 const entrepriseLBS = require('./LBS/entrepriseLBS')
+
+const app = express()
+app.use(bodyParser.json())
+app.use(cookieParser())
+const jwt = require('jsonwebtoken')
+app.use(cors())
 // create application/json parser
 var jsonParser = bodyParser.json()
+
+
+/*
+app.get('/comments', verify, async (req, res) => {
+  res.sendStatus(200)
+})*/
+ // app.post('/login', loginjwt)
+
+
 
 app.get('/offres', async (request, response) => {
   const offres = await offreLBS.getOffre()
   response.status(200).json(offres)
 })
-app.get('/offres/ecole/:id', async (request, response) => {
-  const offres = await offreLBS.getOffreByEcole(request.params.id)
+app.get('/offres/ecole/:idEcole/etudiant/:idEtudiant', async (request, response) => {
+  const offres = await offreLBS.getOffreByEcole(request.params.idEcole, request.params.idEtudiant)
   response.status(200).json(offres)
 })
 
-app.get('/offre/like/:id', async (request, response) => {
+app.get('/offres/like/:id', async (request, response) => {
+  console.log(request.params);
   const offres = await offreLBS.getOffreLiked(request.params.id)
   response.status(200).json(offres)
 })
 
 app.post('/like', jsonParser, async (request, response) => {
+  console.log(request.body);
   await offreLBS.like(request.body.idOffre, request.body.idEtudiant)
   response.status(201).json("Created")
 })
@@ -34,7 +54,7 @@ app.get('/etudiants', async(request, response) => {
   response.status(200).json(etudiants)
 })
 
-app.get('/etudiants/:id', async(request, response) => {
+app.get('/etudiants/:id',verify, async(request, response) => {
   const etudiant = await etudiantLBS.getEtudiantById(request.params.id)
   response.status(200).json(etudiant)
 })
@@ -44,10 +64,25 @@ app.post('/etudiant', jsonParser, async (request, response) => {
   response.status(201).json("Created")
 })
 
-app.get('/connexionEtudiant', async (request, response) => {
+app.get('/connexionEtudiant', async (request, res) => {
   const params = request.headers.authorization.split(":")
-  const user = await etudiantLBS.connexionEtudiant(params)
-  response.status(200).json(user)
+
+  // on va chercher les users 
+  const user = await etudiantLBS.connexionEtudiant(params[0], params[1])
+
+  if(!user ){ // si il est vide 
+    return res.status(401).json("Email ou mot de passe incorrect").send()
+  }else { // si il y a un user 
+    //create the access token with the shorter lifespan
+    let accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        algorithm: "HS256",
+        expiresIn: process.env.ACCESS_TOKEN_LIFE
+    })
+
+    //send the access token to the client inside a cookie
+    res.cookie("jwt", accessToken, {httpOnly: true})
+    res.json(user).send()
+  }
 })
 
 app.post('/ecole', jsonParser, async (request, response) => {

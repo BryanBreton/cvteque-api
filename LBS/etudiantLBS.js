@@ -14,8 +14,8 @@ module.exports = {
     insertEtudiant: async (etudiant) => {
         await db.pool.query(requests.insertEtudiant, [etudiant.nom, etudiant.prenom, etudiant.email, etudiant.password, etudiant.dateNaissance, etudiant.idEcole])
     },
-    connexionEtudiant: async (params) => {
-        const res = await db.pool.query(requests.connexionEtudiant, [params[0], params[1]])
+    connexionEtudiant: async (email, pwd) => {
+        const res = await db.pool.query(requests.connexionEtudiant, [email, pwd])
         const user = await etudiantProcess.getFirstEtudiant(res.rows)
         return user
     }

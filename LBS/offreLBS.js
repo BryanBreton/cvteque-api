@@ -5,8 +5,8 @@ module.exports = {
         const res = await db.pool.query(requests.getOffres)
         return res.rows
     },
-    getOffreByEcole: async (id) => {
-        const res = await db.pool.query(requests.getOffresByEcole, [id])
+    getOffreByEcole: async (idEcole, idEtudiant) => {
+        const res = await db.pool.query(requests.getOffresByEcole, [idEcole, idEtudiant])
         return res.rows
     },
     like: async (idOffre, idEtudiant) => {
