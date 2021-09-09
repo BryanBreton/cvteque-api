@@ -15,6 +15,10 @@ module.exports = {
     getOffreLiked: async (idEtudiant) => {
         const res = await db.pool.query(requests.offresLiked, [idEtudiant])
         return res.rows
+    },
+    getOffreByEntreprise: async (idEntreprise) => {
+        const res = await db.pool.query(requests.getOffresByEntreprise, [idEntreprise])
+        return res.rows
     }
 
 }

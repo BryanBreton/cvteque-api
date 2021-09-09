@@ -14,6 +14,5 @@ module.exports = {
     },
     insertEntreprise: async (entreprise) => {
         await db.pool.query(entreprisesRequests.insertEntreprise, [entreprise.nom, entreprise.ville, entreprise.adresse, entreprise.codePostal, entreprise.pseudo, entreprise.password])
-    }
-
+    },
 }
